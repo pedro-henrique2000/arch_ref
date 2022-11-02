@@ -28,7 +28,7 @@ public class PersonRepository implements IPersonRepository {
             return personMapper.toEntity(savedPerson);
         } catch (DataIntegrityViolationException violationException) {
             if (violationException.getCause() instanceof ConstraintViolationException exception) {
-                if (exception.getConstraintName().contains("UNIQUE_EMAIL_INDEX")) {
+                if (exception.getConstraintName().toLowerCase().contains("unique_email")) {
                     return null;
                 }
             }
