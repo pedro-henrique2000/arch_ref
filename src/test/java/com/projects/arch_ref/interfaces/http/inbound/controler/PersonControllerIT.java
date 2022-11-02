@@ -22,6 +22,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.time.LocalDate;
 import java.time.Month;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -95,6 +96,14 @@ public class PersonControllerIT {
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                 )
                 .andExpect(status().isConflict());
+    }
+
+    @Test
+    void shouldReturn404WhenIdNotFound() throws Exception {
+        long id = 9999L;
+        mockMvc.perform(get("/api/person/" + id)
+                )
+                .andExpect(status().isNotFound());
     }
 
     private static PersonRequest getPersonRequest() {

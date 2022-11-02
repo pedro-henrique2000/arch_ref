@@ -1,6 +1,7 @@
 package com.projects.arch_ref.interfaces.http.inbound.handler;
 
 import com.projects.arch_ref.domain.exceptions.ConflictException;
+import com.projects.arch_ref.domain.exceptions.ResourceNotFoundException;
 import com.projects.arch_ref.interfaces.http.inbound.dto.ExceptionDetails;
 import com.projects.arch_ref.interfaces.http.inbound.dto.ValidationExceptionDetails;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,23 @@ public class AllExceptionHandler extends ResponseEntityExceptionHandler {
                 .build();
 
         return ResponseEntity.status(409).body(exceptionDetails);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ExceptionDetails> handleResourceNotFoundException(final ResourceNotFoundException exception) {
+        exception.printStackTrace();
+
+        log.error("Resource Not Found Exception occurred");
+
+        final ExceptionDetails exceptionDetails = ExceptionDetails.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .details(exception.getMessage())
+                .title("Resource Exception")
+                .timestamp(LocalDateTime.now())
+                .developerMessage(exception.getClass().getName())
+                .build();
+
+        return ResponseEntity.status(404).body(exceptionDetails);
     }
 
     @Override

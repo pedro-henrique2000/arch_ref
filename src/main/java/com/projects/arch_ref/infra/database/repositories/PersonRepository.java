@@ -11,6 +11,8 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Component
 @Slf4j
@@ -38,5 +40,15 @@ public class PersonRepository implements IPersonRepository {
             log.error("unexpected error occurred while saving person. Message: [{}]", exception.getMessage());
             throw exception;
         }
+    }
+
+    @Override
+    public Optional<Person> findById(Long id) {
+        Optional<PersonModel> personModelOptional = jpaPersonRepository.findById(id);
+        if (personModelOptional.isEmpty()) {
+            return Optional.empty();
+        }
+        Person person = personMapper.toEntity(personModelOptional.get());
+        return Optional.of(person);
     }
 }

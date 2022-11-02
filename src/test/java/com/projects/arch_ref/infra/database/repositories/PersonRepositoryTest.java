@@ -15,6 +15,8 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.dao.DataIntegrityViolationException;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -113,5 +115,28 @@ class PersonRepositoryTest {
         when(jpaPersonRepository.save(any(PersonModel.class))).thenThrow(violationException);
 
         assertThrows(DataIntegrityViolationException.class, () -> personRepository.save(personToSave));
+    }
+
+    @Test
+    void shouldReturnEmptyWhenIdNotFound() {
+        when(jpaPersonRepository.findById(1L)).thenReturn(Optional.empty());
+
+        Optional<Person> personOptional = personRepository.findById(1L);
+
+        assertFalse(personOptional.isPresent());
+    }
+
+    @Test
+    void shouldReturnPersonWhenIdExists() {
+        PersonModel foundPerson = mock(PersonModel.class);
+        Person person = mock(Person.class);
+
+        when(jpaPersonRepository.findById(1L)).thenReturn(Optional.of(foundPerson));
+        when(personMapper.toEntity(foundPerson)).thenReturn(person);
+
+        Optional<Person> personOptional = personRepository.findById(1L);
+
+        assertTrue(personOptional.isPresent());
+        assertEquals(person, personOptional.get());
     }
 }

@@ -1,6 +1,8 @@
 package com.projects.arch_ref.interfaces.http.inbound.controler;
 
 import com.projects.arch_ref.application.CreatePerson;
+import com.projects.arch_ref.application.FindPersonById;
+import com.projects.arch_ref.domain.entity.Person;
 import com.projects.arch_ref.interfaces.http.inbound.controler.api.PersonAPI;
 import com.projects.arch_ref.interfaces.http.inbound.dto.PersonRequest;
 import com.projects.arch_ref.interfaces.http.inbound.mapper.PersonMapperDTO;
@@ -17,6 +19,7 @@ import java.net.URI;
 @Slf4j
 public class PersonController implements PersonAPI {
 
+    private final FindPersonById findPersonById;
     private final CreatePerson createPerson;
     private final PersonMapperDTO personMapperDto;
 
@@ -31,5 +34,10 @@ public class PersonController implements PersonAPI {
                 .toUri();
 
         return ResponseEntity.created(location).build();
+    }
+
+    @Override
+    public ResponseEntity<Person> findById(Long id) {
+        return ResponseEntity.ok(findPersonById.invoke(id));
     }
 }
