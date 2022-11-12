@@ -1,6 +1,7 @@
 package com.projects.arch_ref.interfaces.http.inbound.handler;
 
 import com.projects.arch_ref.domain.exceptions.ConflictException;
+import com.projects.arch_ref.domain.exceptions.InvalidTypeException;
 import com.projects.arch_ref.interfaces.http.inbound.dto.ExceptionDetails;
 import com.projects.arch_ref.interfaces.http.inbound.dto.ValidationExceptionDetails;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,13 @@ class AllExceptionHandlerTest {
         ResponseEntity<ExceptionDetails> res = handler.handleConflictException(new ConflictException("any"));
 
         assertEquals(409, res.getStatusCodeValue());
+    }
+
+    @Test
+    void shouldReturnStatus400WhenInvalidTypeException() {
+        ResponseEntity<ExceptionDetails> res = handler.handleInvalidTypeException(new InvalidTypeException("any"));
+
+        assertEquals(400, res.getStatusCodeValue());
     }
 
     @Test

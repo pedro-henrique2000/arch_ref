@@ -1,6 +1,7 @@
 package com.projects.arch_ref.interfaces.http.inbound.handler;
 
 import com.projects.arch_ref.domain.exceptions.ConflictException;
+import com.projects.arch_ref.domain.exceptions.InvalidTypeException;
 import com.projects.arch_ref.domain.exceptions.ResourceNotFoundException;
 import com.projects.arch_ref.interfaces.http.inbound.dto.ExceptionDetails;
 import com.projects.arch_ref.interfaces.http.inbound.dto.ValidationExceptionDetails;
@@ -23,6 +24,21 @@ import java.util.Map;
 @RestControllerAdvice
 @Slf4j
 public class AllExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(InvalidTypeException.class)
+    public ResponseEntity<ExceptionDetails> handleInvalidTypeException(final InvalidTypeException exception) {
+        log.error("InvalidTypeException occurred");
+
+        final ExceptionDetails exceptionDetails = ExceptionDetails.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .details(exception.getMessage())
+                .title("InvalidTypeException Exception")
+                .timestamp(LocalDateTime.now())
+                .developerMessage(exception.getClass().getName())
+                .build();
+
+        return ResponseEntity.status(400).body(exceptionDetails);
+    }
 
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<ExceptionDetails> handleConflictException(final ConflictException conflictException) {

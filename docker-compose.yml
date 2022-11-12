@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   arch_ref:
-    image: arch_ref:1.1
+    image: arch_ref:1.2
     depends_on:
       - postgres
     environment:

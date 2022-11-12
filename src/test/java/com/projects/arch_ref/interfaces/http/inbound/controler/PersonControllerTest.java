@@ -1,9 +1,15 @@
 package com.projects.arch_ref.interfaces.http.inbound.controler;
 
 import com.projects.arch_ref.application.CreatePerson;
+import com.projects.arch_ref.application.FindPersonById;
+import com.projects.arch_ref.application.FindPersonBySearch;
 import com.projects.arch_ref.domain.entity.Person;
+import com.projects.arch_ref.domain.entity.search.PersonSearch;
+import com.projects.arch_ref.domain.entity.search.PersonSearchResponse;
 import com.projects.arch_ref.interfaces.http.inbound.dto.PersonRequest;
+import com.projects.arch_ref.interfaces.http.inbound.dto.PersonSearchDTO;
 import com.projects.arch_ref.interfaces.http.inbound.mapper.PersonMapperDTO;
+import com.projects.arch_ref.interfaces.http.inbound.mapper.PersonSearchMapperDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +22,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -32,6 +40,15 @@ class PersonControllerTest {
 
     @Mock
     private PersonMapperDTO personMapperDto;
+
+    @Mock
+    private PersonSearchMapperDTO personSearchMapperDTO;
+
+    @Mock
+    private FindPersonBySearch findPersonBySearch;
+
+    @Mock
+    private FindPersonById findPersonById;
 
     private PersonRequest personRequest;
 
@@ -72,6 +89,56 @@ class PersonControllerTest {
 
         assertEquals(201, responseEntity.getStatusCodeValue());
         assertTrue(responseEntity.getHeaders().get("Location").get(0).equals("http://localhost/1"));
+    }
+
+    @Test
+    void shouldCallFindByIdWithCorrectParam() {
+        Person person = mock(Person.class);
+        when(findPersonById.invoke(1L)).thenReturn(person);
+        ResponseEntity<Person> responseEntity = assertDoesNotThrow(() -> personController.findById(1L));
+
+        verify(findPersonById, times(1)).invoke(1L);
+
+        assertEquals(200, responseEntity.getStatusCodeValue());
+        assertEquals(person, responseEntity.getBody());
+    }
+
+    @Test
+    void shouldReturnStatus200() {
+        PersonSearchDTO personSearchDTO = mock(PersonSearchDTO.class);
+        PersonSearch personSearch = mock(PersonSearch.class);
+        PersonSearchResponse searchResponse = mock(PersonSearchResponse.class);
+        List<Person> personList = mock(List.class);
+
+        when(personSearchMapperDTO.toEntity(personSearchDTO)).thenReturn(personSearch);
+        when(findPersonBySearch.invoke(personSearch)).thenReturn(searchResponse);
+        when(findPersonBySearch.invoke(personSearch)).thenReturn(searchResponse);
+        when(searchResponse.getPersons()).thenReturn(personList);
+        when(personList.isEmpty()).thenReturn(false);
+
+        ResponseEntity<PersonSearchResponse> responseEntity = assertDoesNotThrow(() -> personController.findBySearch(personSearchDTO));
+
+        assertEquals(200, responseEntity.getStatusCodeValue());
+        assertEquals(searchResponse, responseEntity.getBody());
+    }
+
+    @Test
+    void shouldReturnStatus204() {
+        PersonSearchDTO personSearchDTO = mock(PersonSearchDTO.class);
+        PersonSearch personSearch = mock(PersonSearch.class);
+        PersonSearchResponse searchResponse = mock(PersonSearchResponse.class);
+        List<Person> personList = mock(List.class);
+
+        when(personSearchMapperDTO.toEntity(personSearchDTO)).thenReturn(personSearch);
+        when(findPersonBySearch.invoke(personSearch)).thenReturn(searchResponse);
+        when(findPersonBySearch.invoke(personSearch)).thenReturn(searchResponse);
+        when(searchResponse.getPersons()).thenReturn(personList);
+        when(personList.isEmpty()).thenReturn(true);
+
+        ResponseEntity<PersonSearchResponse> responseEntity = assertDoesNotThrow(() -> personController.findBySearch(personSearchDTO));
+
+        assertEquals(204, responseEntity.getStatusCodeValue());
+        assertEquals(searchResponse, responseEntity.getBody());
     }
 
 }

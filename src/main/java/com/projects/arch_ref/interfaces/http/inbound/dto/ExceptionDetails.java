@@ -1,11 +1,13 @@
 package com.projects.arch_ref.interfaces.http.inbound.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @SuperBuilder
 public class ExceptionDetails {
 

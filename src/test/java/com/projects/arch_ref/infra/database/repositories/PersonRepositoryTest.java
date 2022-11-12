@@ -1,9 +1,15 @@
 package com.projects.arch_ref.infra.database.repositories;
 
 import com.projects.arch_ref.domain.entity.Person;
+import com.projects.arch_ref.domain.entity.search.PersonSearch;
+import com.projects.arch_ref.domain.entity.search.PersonSearchResponse;
+import com.projects.arch_ref.domain.entity.search.SortType;
 import com.projects.arch_ref.infra.database.mapper.PersonMapper;
 import com.projects.arch_ref.infra.database.model.PersonModel;
 import com.projects.arch_ref.infra.database.repositories.jpa.JpaPersonRepository;
+import com.projects.arch_ref.infra.database.repositories.jpa.JpaPersonSpecification;
+import com.projects.arch_ref.infra.database.repositories.jpa.PersonSpecificationBuilder;
+import com.projects.arch_ref.infra.database.repositories.jpa.SearchCriteria;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,8 +19,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.cloud.context.named.NamedContextFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,6 +44,9 @@ class PersonRepositoryTest {
 
     @Mock
     private PersonMapper personMapper;
+
+    @Mock
+    private PersonSpecificationBuilder personSpecificationBuilder;
 
     private Person personToSave;
 
@@ -138,5 +153,26 @@ class PersonRepositoryTest {
 
         assertTrue(personOptional.isPresent());
         assertEquals(person, personOptional.get());
+    }
+
+    @Test
+    void shouldReturnPersonSearchResponse() {
+        PersonSearch personSearch = mock(PersonSearch.class);
+        SearchCriteria searchCriteria = mock(SearchCriteria.class);
+        List<SearchCriteria> searchCriteriaList = List.of(searchCriteria);
+        PersonModel personModell = mock(PersonModel.class);
+        Person entity = mock(Person.class);
+        PageImpl<PersonModel> personModels = new PageImpl<>(List.of(personModell));
+
+        when(personSpecificationBuilder.buildSearchCriterias(personSearch)).thenReturn(searchCriteriaList);
+        when(personSearch.getSortType()).thenReturn(SortType.ASC);
+        when(personSearch.getPage()).thenReturn(0);
+        when(personSearch.getLimit()).thenReturn(10);
+        when(jpaPersonRepository.findAll(any(JpaPersonSpecification.class), any(Pageable.class))).thenReturn(personModels);
+        when(personMapper.toEntity(personModell)).thenReturn(entity);
+
+        PersonSearchResponse response = personRepository.findBySearch(personSearch);
+
+        assertEquals(entity, response.getPersons().get(0));
     }
 }

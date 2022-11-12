@@ -22,8 +22,10 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.time.LocalDate;
 import java.time.Month;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Testcontainers
@@ -104,6 +106,60 @@ public class PersonControllerIT {
         mockMvc.perform(get("/api/person/" + id)
                 )
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldReturn200WhenIdFound() throws Exception {
+        PersonModel personModel = new PersonModel();
+        personModel.setFirstName("first");
+        personModel.setLastName("last");
+        personModel.setEmail("pedro@mail.com");
+        personModel.setGender(Gender.MALE);
+        personModel.setBirthDate(LocalDate.of(1995, Month.SEPTEMBER, 26));
+
+        PersonModel model = jpaPersonRepository.save(personModel);
+
+
+        jpaPersonRepository.save(personModel);
+        mockMvc.perform(get("/api/person/" + model.getId())
+                )
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldReturn200WhenFound() throws Exception {
+        PersonModel personModel = new PersonModel();
+        personModel.setFirstName("first");
+        personModel.setLastName("last");
+        personModel.setEmail("pedro@mail.com");
+        personModel.setGender(Gender.MALE);
+        personModel.setBirthDate(LocalDate.of(1995, Month.SEPTEMBER, 26));
+
+        PersonModel personModel1 = new PersonModel();
+        personModel1.setFirstName("second");
+        personModel1.setLastName("lastName");
+        personModel1.setEmail("henrique@mail.com");
+        personModel1.setGender(Gender.MALE);
+        personModel1.setBirthDate(LocalDate.of(1995, Month.SEPTEMBER, 26));
+
+        jpaPersonRepository.save(personModel);
+        jpaPersonRepository.save(personModel1);
+
+        mockMvc.perform(get("/api/person")
+                        .param("firstName", "first")
+                        .param("lastName", "last")
+                        .param("gender", "MALE")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.persons", hasSize(1)));
+    }
+
+    @Test
+    void shouldReturn204WhenNotFoundAnyMatch() throws Exception {
+        mockMvc.perform(get("/api/person")
+                        .param("email", "any@mail.com")
+                )
+                .andExpect(status().isNoContent());
     }
 
     private static PersonRequest getPersonRequest() {
