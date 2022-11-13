@@ -1,6 +1,7 @@
 package com.projects.arch_ref.interfaces.http.inbound.controler;
 
 import com.projects.arch_ref.application.CreatePerson;
+import com.projects.arch_ref.application.DeletePerson;
 import com.projects.arch_ref.application.FindPersonById;
 import com.projects.arch_ref.application.FindPersonBySearch;
 import com.projects.arch_ref.domain.entity.Person;
@@ -28,6 +29,7 @@ public class PersonController implements PersonAPI {
     private final FindPersonBySearch findPersonBySearch;
     private final FindPersonById findPersonById;
     private final CreatePerson createPerson;
+    private final DeletePerson deletePerson;
     private final PersonMapperDTO personMapperDto;
     private final PersonSearchMapperDTO personSearchMapperDTO;
 
@@ -55,5 +57,11 @@ public class PersonController implements PersonAPI {
         PersonSearchResponse searchResponse = this.findPersonBySearch.invoke(personSearch);
         HttpStatus status = searchResponse.getPersons().isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK;
         return ResponseEntity.status(status.value()).body(searchResponse);
+    }
+
+    @Override
+    public ResponseEntity<Void> delete(Long id) {
+        this.deletePerson.invoke(id);
+        return ResponseEntity.noContent().build();
     }
 }

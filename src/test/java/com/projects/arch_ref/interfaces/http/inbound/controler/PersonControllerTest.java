@@ -1,6 +1,7 @@
 package com.projects.arch_ref.interfaces.http.inbound.controler;
 
 import com.projects.arch_ref.application.CreatePerson;
+import com.projects.arch_ref.application.DeletePerson;
 import com.projects.arch_ref.application.FindPersonById;
 import com.projects.arch_ref.application.FindPersonBySearch;
 import com.projects.arch_ref.domain.entity.Person;
@@ -46,6 +47,9 @@ class PersonControllerTest {
 
     @Mock
     private FindPersonBySearch findPersonBySearch;
+
+    @Mock
+    private DeletePerson deletePerson;
 
     @Mock
     private FindPersonById findPersonById;
@@ -139,6 +143,13 @@ class PersonControllerTest {
 
         assertEquals(204, responseEntity.getStatusCodeValue());
         assertEquals(searchResponse, responseEntity.getBody());
+    }
+
+    @Test
+    void shouldReturnStatus204OnDelete() {
+        ResponseEntity<Void> responseEntity = assertDoesNotThrow(() -> personController.delete(1L));
+        verify(deletePerson, times(1)).invoke(1L);
+        assertEquals(204, responseEntity.getStatusCodeValue());
     }
 
 }

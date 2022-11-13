@@ -21,12 +21,13 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
 @ActiveProfiles("test")
@@ -152,6 +153,31 @@ public class PersonControllerIT {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.persons", hasSize(1)));
+    }
+
+    @Test
+    void shouldReturn204OnDelete() throws Exception {
+        PersonModel personModel = new PersonModel();
+        personModel.setFirstName("first");
+        personModel.setLastName("last");
+        personModel.setEmail("pedro@mail.com");
+        personModel.setGender(Gender.MALE);
+        personModel.setBirthDate(LocalDate.of(1995, Month.SEPTEMBER, 26));
+
+        jpaPersonRepository.save(personModel);
+
+        mockMvc.perform(delete("/api/person/" + personModel.getId()))
+                .andExpect(status().isNoContent());
+
+        Optional<PersonModel> person = this.jpaPersonRepository.findById(personModel.getId());
+
+        assertTrue(person.isEmpty());
+    }
+
+    @Test
+    void shouldReturn204OnDeleteWhenIdNotFound() throws Exception {
+        mockMvc.perform(delete("/api/person/1"))
+                .andExpect(status().isNoContent());
     }
 
     @Test

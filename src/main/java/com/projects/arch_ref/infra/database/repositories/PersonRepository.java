@@ -70,6 +70,16 @@ public class PersonRepository implements IPersonRepository {
         return new PersonSearchResponse(persons, result.getTotalPages(), result.getTotalElements());
     }
 
+    @Override
+    public void delete(Long id) {
+        try {
+            this.jpaPersonRepository.deleteById(id);
+        } catch (Exception exception) {
+            log.error("An error occurred while deleting person with id {}", id);
+            throw exception;
+        }
+    }
+
     private static Pageable getPageable(PersonSearch personSearch) {
         Sort.Direction direction = Sort.Direction.fromString(personSearch.getSortType().getValue());
         Sort sort = Sort.by(direction, FIRST_NAME);

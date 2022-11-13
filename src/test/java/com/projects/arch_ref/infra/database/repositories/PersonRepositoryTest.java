@@ -175,4 +175,16 @@ class PersonRepositoryTest {
 
         assertEquals(entity, response.getPersons().get(0));
     }
+
+    @Test
+    void shouldCallJpaRepository() {
+        personRepository.delete(1L);
+        verify(jpaPersonRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    void shouldThrowIfDeleteThrows() {
+        doThrow(new RuntimeException()).when(jpaPersonRepository).deleteById(anyLong());
+        assertThrows(RuntimeException.class, () -> personRepository.delete(1L));
+    }
 }

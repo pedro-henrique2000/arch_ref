@@ -10,4 +10,5 @@ public interface IPersonRepository {
     Person save(Person person);
     Optional<Person> findById(Long id);
     PersonSearchResponse findBySearch(PersonSearch personSearch);
+    void delete(Long id);
 }

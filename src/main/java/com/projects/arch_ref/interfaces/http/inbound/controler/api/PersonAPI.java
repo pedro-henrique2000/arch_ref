@@ -62,4 +62,9 @@ public interface PersonAPI {
                     schema = @Schema(implementation = ExceptionDetails.class))})
     })
     ResponseEntity<PersonSearchResponse> findBySearch(PersonSearchDTO personSearch);
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    ResponseEntity<Void> delete(@PathVariable Long id);
+
 }
