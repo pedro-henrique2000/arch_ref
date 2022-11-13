@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -26,6 +27,7 @@ import java.util.Map;
 public class AllExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(InvalidTypeException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ExceptionDetails> handleInvalidTypeException(final InvalidTypeException exception) {
         log.error("InvalidTypeException occurred");
 
@@ -41,6 +43,7 @@ public class AllExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseEntity<ExceptionDetails> handleConflictException(final ConflictException conflictException) {
         conflictException.printStackTrace();
 
@@ -58,6 +61,7 @@ public class AllExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<ExceptionDetails> handleResourceNotFoundException(final ResourceNotFoundException exception) {
         exception.printStackTrace();
 
@@ -75,6 +79,7 @@ public class AllExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException methodArgumentNotValidException, HttpHeaders headers, HttpStatus status, WebRequest request) {
         log.info("Fields Error {}", methodArgumentNotValidException.getAllErrors());
         List<FieldError> fieldErrors = methodArgumentNotValidException.getBindingResult().getFieldErrors();
@@ -91,6 +96,7 @@ public class AllExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ExceptionDetails> handleException(final Exception exception) {
         log.error("Unexpected error ocurred. Message: {}", exception.getMessage());
         ExceptionDetails exceptionDetails = ExceptionDetails.builder()
