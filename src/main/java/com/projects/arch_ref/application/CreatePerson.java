@@ -15,11 +15,13 @@ public class CreatePerson {
     private final IPersonRepository personRepository;
 
     public Long invoke(Person person) {
+        log.info("CreatePerson:invoke execution started. email: {}", person.getEmail());
         Person savedPerson = personRepository.save(person);
         if (savedPerson == null) {
             throw new ConflictException("There is already a person with email " + person.getEmail());
         }
-        log.info("Saved person with ID: {} and Email: {}", savedPerson.getId(), savedPerson.getEmail());
+        log.debug("Saved person {}", savedPerson);
+        log.info("CreatePerson:invoke execution concluded. email: {}", person.getEmail());
         return savedPerson.getId();
     }
 }

@@ -15,7 +15,10 @@ public class FindPersonBySearch {
     private final IPersonRepository personRepository;
 
     public PersonSearchResponse invoke(PersonSearch personSearch) {
-        return personRepository.findBySearch(personSearch);
+        log.info("FindPersonBySearch:invoke execution started. parameter {}", personSearch);
+        PersonSearchResponse bySearch = personRepository.findBySearch(personSearch);
+        log.info("FindPersonBySearch:invoke execution finished. response {}", bySearch);
+        return bySearch;
     }
 
 }

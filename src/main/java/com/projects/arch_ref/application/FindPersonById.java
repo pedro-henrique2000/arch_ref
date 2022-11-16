@@ -15,8 +15,12 @@ public class FindPersonById {
     private final IPersonRepository personRepository;
 
     public Person invoke(Long id) {
-        log.info("Searching for person with id {}", id);
-        return personRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Not found person with id " + id));
+        log.info("FindPersonById:invoke execution started {}", id);
+        Person person = personRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Not found person with id " + id));
+        log.debug("FindPersonById:invoke found [{}]", person);
+        log.info("FindPersonById:invoke execution concluded {}", id);
+        return person;
     }
 
 }
